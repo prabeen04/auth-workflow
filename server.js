@@ -1,32 +1,19 @@
 const express = require('express');
 const path = require('path');
-// const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 // const routes = require('./routes/users');
-// const postsroutes = require('./routes/posts');
 const cors = require('cors')
-
-
-// var passport = require("passport");
-// var mongodbURL = require('./config/database.config')
-// const authUserRoute = require('./routes/authUserRoute');
-
+const { mongoURI } = require('./config/keys')
 const app = express();
-// var mongoURI = mongodbURL.mongodbURL;
-// mongoose.Promise = global.Promise;
-// mongoose.connect(mongoURI);
-
+mongoose.Promise = global.Promise;
+mongoose.connect("mongodb://localhost:27017/YourDB", { useNewUrlParser: true });
 //Get the default connection
-// var db = mongoose.connection;
+let db = mongoose.connection;
 
 //Bind connection to error event (to get notification of connection errors)
-// db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-// 
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-
-/////middlewares////
-// cors middleware
 app.use(cors())
 
 // body parser middleware
