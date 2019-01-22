@@ -1,2 +1,5 @@
 # dependencies
 /node_modules
+
+#client folder
+/client/node_modules

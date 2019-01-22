@@ -21,7 +21,9 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
     extended: false
 }));
-
+app.get('/api/hello', (req, res) => {
+    res.send({ express: 'Hello From Express' });
+});
 // route handler middleware
 // app.use('/api', [routes, postsroutes, todoRoutes, eventsRoutes/*, authUserRoute*/]);
 // error handling middleware
