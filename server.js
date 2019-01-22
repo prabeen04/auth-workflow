@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-// const routes = require('./routes/users');
+const users = require('./routes/userRoute');
 const cors = require('cors')
 const { mongoURI } = require('./config/keys')
 const app = express();
@@ -25,7 +25,8 @@ app.get('/api/hello', (req, res) => {
     res.send({ express: 'Hello From Express' });
 });
 // route handler middleware
-// app.use('/api', [routes, postsroutes, todoRoutes, eventsRoutes/*, authUserRoute*/]);
+app.use('/api', [users]);
+
 // error handling middleware
 app.use(function (err, req, res, next) {
     if (err) {
