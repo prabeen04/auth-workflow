@@ -20,7 +20,7 @@ router.get('/users/:id', function (req, res, next) {
         .catch(next)
 });
 //POST request to /users
-router.post('/users', function (req, res, next) {   
+router.post('/register', function (req, res, next) {   
     var users = (req.body);
     UserModel.create(users)
         .then(user => {
