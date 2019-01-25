@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const saltRound = 10;
+const clientSecret = '!@#$%^&*()_+'
 //POST request to /users
 router.post('/register', function (req, res, next) {
     const { firstName, lastName, email, password } = req.body;
@@ -45,11 +47,12 @@ router.post('/login', function (req, res, next) {
                 return res.status(404).json({ error: 'User not found' })
             }
             bcrypt.compare(password, user.password)
-                .then(isSame => {
-                    if (!isSame) {
+                .then(match => {
+                    if (!match) {
                         return res.status(400).json({ error: 'Icorrect password' })
                     }
-                    return res.status(200).json({user})
+                    const token = jwt.sign({ email }, clientSecret)
+                    return res.status(200).json({ user, token })
                 })
                 .catch(err => { throw err })
         })
