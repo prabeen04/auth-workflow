@@ -47,6 +47,7 @@ router.post('/register', function (req, res, next) {
         })
         .catch(err => { throw err })
 });
+
 //login request
 router.post('/login', function (req, res, next) {
     const { email, password } = req.body;
@@ -93,7 +94,7 @@ router.put('/changePassword', function (req, res, next) {
                             console.log('newHash' + newHash)
                             User.findOneAndUpdate({ _id }, { password: newHash })
                                 // .then(response => res.status(200).json({ success: 'Password changed successfully' }))
-                                .then(response => console.log('response '+response))
+                                .then(response => console.log('response ' + response))
                                 .catch(err => console.log(err))
                         })
                         .catch(err => console.log(err))
@@ -101,19 +102,8 @@ router.put('/changePassword', function (req, res, next) {
                 .catch(err => { throw err })
         })
         .catch(err => console.log(err))
-
-
-
-    // UserModel.findByIdAndUpdate({ "_id": _id }, { password })
-    //     .then(() => {
-    //         UserModel.findOne({ "_id": req.params.id })
-    //             .then(user => {
-    //                 res.status(200).send(user);
-    //             })
-    //             .catch(next)
-    //     })
-    //     .catch(next)
 });
+
 //send mail to the email address
 router.get('/sendMail', function async(req, res, next) {
     var message = {
@@ -203,20 +193,5 @@ router.get('/sendMail', function async(req, res, next) {
         // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
     });
 });
-
-//PUT request to /users/:id
-// router.put('/users/:id', function (req, res, next) {
-//     UserModel.findByIdAndUpdate({ "_id": req.params.id }, req.body)
-//         .then(() => {
-//             UserModel.findOne({ "_id": req.params.id })
-//                 .then(user => {
-//                     res.status(200).send(user);
-//                 })
-//                 .catch(next)
-//         })
-//         .catch(next)
-// });
-
-
 
 module.exports = router;
