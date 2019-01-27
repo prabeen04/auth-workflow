@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
 const mandrill = require('mandrill-api/mandrill')
 const mandrillClient = new mandrill.Mandrill('zBiwJhM-JAz7wXS0asx-AA')
 // const mandrillClient = new mandrill.Mandrill('fD-HfoAUJEab-XxZb12Q6A')
@@ -21,10 +23,14 @@ function hashPassword(password) {
             .catch(err => { reject(err) })
     })
 }
+//upload an image
+router.post('/upload', upload.single('avatar'), function (req, res, next){
+    console.log(req.file)
+})
 
 //POST request to /users
 router.post('/register', function (req, res, next) {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, avatar } = req.body;
     User.findOne({ email })
         .then(user => {
             if (user) return res.status(409).json({ error: 'Email is already registered !' })

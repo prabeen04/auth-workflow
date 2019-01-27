@@ -21,6 +21,9 @@ const UserSchema = new schema({
         type: String,
         required: true,
         trim: true,
+    },
+    avatar: {
+        type: String,
     }
 })
 // UserSchema.vi
