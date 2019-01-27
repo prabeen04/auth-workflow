@@ -111,7 +111,7 @@ router.get('/sendMail', function async(req, res, next) {
         "html": "<p>Example HTML content</p>",
         "text": "Example text content",
         "subject": "example subject",
-        "from_email": "message.from_email@example.com",
+        "from_email": "connections@hyphenmail.com",
         "from_name": "Example Name",
         "to": [{
             "email": "prabeen.strange@gmail.com",
@@ -119,7 +119,7 @@ router.get('/sendMail', function async(req, res, next) {
             "type": "to"
         }],
         "headers": {
-            "Reply-To": "message.reply@example.com"
+            "Reply-To": "connections@hyphenmail.com"
         }
     };
     var async = false;
