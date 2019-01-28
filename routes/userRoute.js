@@ -93,6 +93,34 @@ router.post('/login', function (req, res, next) {
         .catch(err => { throw err })
 });
 
+//login through google
+router.post('/googleLogin', function (req, res, next) {
+    const { email, firstName, lastName, avatar } = req.body;
+    //check if user already register
+    User.findOne({ email })
+        .then(user => {
+            //if registered login to the app
+            console.log('google', user)
+            if (user) {
+                return res.status(200).json({ user })
+            } else {
+                //else create a new user and insert to the db and login to the app
+                const newUser = new User({
+                    firstName,
+                    lastName,
+                    email,
+                    avatar
+                })
+                newUser.save()
+                    .then(user => {
+                        return res.status(200).json({ user })
+                    })
+                    .catch(err => { throw err })
+            }
+        })
+        .catch(err => { throw err })
+})
+
 //change password
 router.put('/changePassword', function (req, res, next) {
     const { _id, currentPassword, newPassword } = req.body;
