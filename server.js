@@ -7,7 +7,7 @@ const cors = require('cors')
 const { mongoURI } = require('./config/keys')
 const app = express();
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/YourDB", { useNewUrlParser: true });
+mongoose.connect("mongodb://localhost:27017/auth", { useNewUrlParser: true });
 //Get the default connection
 let db = mongoose.connection;
 

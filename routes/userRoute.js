@@ -14,11 +14,11 @@ const clientSecret = '!@#$%^&*()_+';
 
 
 const storage = new GridFsStorage({
-    url: 'mongodb://localhost:27017/auth/upload',
+    url: 'mongodb://localhost:27017/auth',
     file: (req, file) => {
-        if (file.mimetype === 'image/jpeg') {
+        if (file.mimetype === 'image/jpeg' ||'image/jpg' ||'image/png'  ) {
             return {
-                bucketName: 'photos'
+                filename: 'file_' + Date.now()
             };
         } else {
             return null;
@@ -46,13 +46,12 @@ router.post('/upload', upload.single('avatar'), function (req, res, next) {
 
 //POST request to /users
 router.post('/register', function (req, res, next) {
-    const { firstName, lastName, email, password, avatar } = req.body;
+    const { userName, email, password, avatar } = req.body;
     User.findOne({ email })
         .then(user => {
             if (user) return res.status(409).json({ error: 'Email is already registered !' })
             const newUser = new User({
-                firstName,
-                lastName,
+                userName,
                 email,
                 password,
             })
@@ -95,25 +94,26 @@ router.post('/login', function (req, res, next) {
 
 //login through google
 router.post('/googleLogin', function (req, res, next) {
-    const { email, firstName, lastName, avatar } = req.body;
+    const { email, userName, avatar } = req.body;
     //check if user already register
     User.findOne({ email })
         .then(user => {
             //if registered login to the app
             console.log('google', user)
             if (user) {
-                return res.status(200).json({ user })
+                const token = jwt.sign({ email }, clientSecret)
+                return res.status(200).json({ user, token })
             } else {
                 //else create a new user and insert to the db and login to the app
                 const newUser = new User({
-                    firstName,
-                    lastName,
+                    userName,
                     email,
                     avatar
                 })
                 newUser.save()
                     .then(user => {
-                        return res.status(200).json({ user })
+                        const token = jwt.sign({ email }, clientSecret)
+                        return res.status(200).json({ user, token })
                     })
                     .catch(err => { throw err })
             }
@@ -195,15 +195,20 @@ router.get('/sendMail', function async(req, res, next) {
 
 //change email address after clicking on the changeEmail link sent to the mail
 router.post('/changeEmail', function (req, res, next) {
-    const { _id, email, token } = req.body;
-    User.findOne({ _id })
-        .then(user => {
-            if (!user) return res.status(400).json({ error: 'No user found' })
-            User.findOneAndUpdate({ _id }, { email })
-                .then(user => console.log('after updated', user))
-                .catch(err => console.log('after updated', err))
-        })
-        .catch(err => console.log(err))
+    const { token } = req.body;
+    jwt.verify(token, clientSecret, (match) => {
+        if (!match) return res.status(400).json({ error: 'Invalid activation link' })
+        User.findOne({ _id })
+            .then(user => {
+                if (!user) return res.status(400).json({ error: 'No user found' })
+                User.findOneAndUpdate({ _id }, { email })
+                    .then(user => {
+                        return res.status(200).json({ user, token })
+                    })
+                    .catch(err => console.log('after updated', err))
+            })
+            .catch(err => console.log(err))
+    })
 })
 
 module.exports = router;
