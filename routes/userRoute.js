@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -14,19 +15,20 @@ const saltRound = 10;
 const clientSecret = '!@#$%^&*()_+';
 
 
-const storage = new GridFsStorage({
-    url: 'mongodb://localhost:27017/auth',
-    file: (req, file) => {
-        if (file.mimetype === 'image/jpeg' ||'image/jpg' ||'image/png'  ) {
-            return {
-                filename: 'file_' + Date.now()
-            };
-        } else {
-            return null;
-        }
-    }
-});
-const upload = multer({ storage })
+// const storage = new GridFsStorage({
+//     url: 'mongodb://localhost:27017/auth',
+//     file: (req, file) => {
+//         if (file.mimetype === 'image/jpeg' ||'image/jpg' ||'image/png'  ) {
+//             return {
+//                 filename: 'file_' + Date.now() + path.extname(file.originalname),
+//                 bucketName: 'uploads'
+//             };
+//         } else {
+//             return null;
+//         }
+//     }
+// });
+// const upload = multer({ storage })
 //hash a password
 function hashPassword(password) {
     return new Promise((resolve, reject) => {
@@ -40,10 +42,10 @@ function hashPassword(password) {
     })
 }
 //upload an image
-router.post('/upload', upload.single('avatar'), function (req, res, next) {
-    console.log(req.file)
-    res.send('image got here')
-})
+// router.post('/upload', upload.single('avatar'), function (req, res, next) {
+//     console.log(req.file)
+//     res.send('image got here')
+// })
 
 //POST request to /users
 router.post('/register', function (req, res, next) {
