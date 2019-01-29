@@ -4,8 +4,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mandrill = require('mandrill-api/mandrill')
-const mandrillClient = new mandrill.Mandrill('zBiwJhM-JAz7wXS0asx-AA')
-// const mandrillClient = new mandrill.Mandrill('fD-HfoAUJEab-XxZb12Q6A')
+// const mandrillClient = new mandrill.Mandrill('zBiwJhM-JAz7wXS0asx-AA')
+const mandrillClient = new mandrill.Mandrill('fD-HfoAUJEab-XxZb12Q6A')
 const User = require('../models/userModel');
 const saltRound = 10;
 const clientSecret = '!@#$%^&*()_+';
@@ -136,13 +136,18 @@ router.put('/changePassword', function (req, res, next) {
 });
 
 //send mail to the email address
-router.get('/sendMail', function async(req, res, next) {
-    var message = {
-        "html": "<p>Example HTML content</p>",
+router.post('/sendMail', function async(req, res, next) {
+    console.log(req.body)
+    const template = `
+    <p>Click on the link below to authenticate your email</p>
+    <a target='_blank' href='http://localhost:3000/emailValidation/${token}'>http://localhost:3000/emailValidation/${token}</a>
+    `
+    const message = {
+        "html": template,
         "text": "Example text content",
-        "subject": "example subject",
+        "subject": "Email authentication",
         "from_email": "connections@hyphenmail.com",
-        "from_name": "Example Name",
+        "from_name": "Hyphenapp",
         "to": [{
             "email": "prabeen.strange@gmail.com",
             "name": "Recipient Name",
