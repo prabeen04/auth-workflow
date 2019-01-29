@@ -6,21 +6,11 @@ const users = require('./routes/userRoute');
 const uploads = require('./routes/imageRoute');
 const cors = require('cors')
 const { mongoURI } = require('./config/keys')
-const Grid = require('gridfs-stream');
 const app = express();
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost:27017/auth", { useNewUrlParser: true });
 //Get the default connection
 let conn = mongoose.createConnection("mongodb://localhost:27017/auth");
-// Init gfs
-let gfs;
-
-conn.once('open', () => {
-  console.log('database connection successfull')
-  // Init stream
-  gfs = Grid(conn.db, mongoose.mongo);
-  gfs.collection('uploads');
-});
 
 //Bind connection to error event (to get notification of connection errors)
 conn.on('error', console.error.bind(console, 'MongoDB connection error:'));
