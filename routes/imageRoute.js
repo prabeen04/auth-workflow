@@ -24,7 +24,7 @@ const storage = new GridFsStorage({
     file: (req, file) => {
         if (file.mimetype === 'image/jpeg' || 'image/jpg' || 'image/png') {
             return {
-                filename: 'file_' + Date.now() + path.extname(file.originalname),
+                filename: 'image_' + Date.now() + path.extname(file.originalname),
                 bucketName: 'uploads'
             };
         } else {
@@ -37,12 +37,10 @@ const upload = multer({ storage })
 //upload an image
 router.post('/upload', upload.single('avatar'), function (req, res, next) {
     console.log(req.file)
-    // res.send('image got here')
     res.status(200).send(req.file.filename)
 })
 
-// @route GET /image/:filename
-// @desc Display Image
+// get image stream
 router.get('/image/:filename', (req, res) => {
     console.log('imagename' + req.params.filename)
     gfs.files.findOne({ filename: req.params.filename }, (err, file) => {

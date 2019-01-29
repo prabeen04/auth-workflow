@@ -33,6 +33,7 @@ router.post('/register', function (req, res, next) {
                 userName,
                 email,
                 password,
+                avatar
             })
             hashPassword(password)
                 .then(hash => {
