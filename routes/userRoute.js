@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer')
 const GridFsStorage = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
 // const upload = multer({ dest: 'mongodb://localhost:27017' })
 const mandrill = require('mandrill-api/mandrill')
 const mandrillClient = new mandrill.Mandrill('zBiwJhM-JAz7wXS0asx-AA')
