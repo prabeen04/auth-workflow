@@ -3,3 +3,5 @@
 
 #client folder
 /client/node_modules
+# .env
+/.env

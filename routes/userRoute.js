@@ -1,14 +1,15 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
+require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mandrill = require('mandrill-api/mandrill')
 // const mandrillClient = new mandrill.Mandrill('zBiwJhM-JAz7wXS0asx-AA')
-const mandrillClient = new mandrill.Mandrill('fD-HfoAUJEab-XxZb12Q6A')
+const mandrillClient = new mandrill.Mandrill(process.env.MANDRILL_KEY)
 const User = require('../models/userModel');
 const saltRound = 10;
-const clientSecret = '!@#$%^&*()_+';
+const clientSecret = process.env.CLIENT_SECRET;
 
 //hash a password
 function hashPassword(password) {
