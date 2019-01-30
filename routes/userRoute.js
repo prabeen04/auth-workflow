@@ -137,10 +137,14 @@ router.put('/changePassword', function (req, res, next) {
 
 //send mail to the email address
 router.post('/sendMail', function async(req, res, next) {
+    console.log('req.body')
     console.log(req.body)
+    const { _id, email } = req.body;
+    const token = jwt.sign({ _id, email }, clientSecret)
     const template = `
     <p>Click on the link below to authenticate your email</p>
-    <a target='_blank' href='http://localhost:3000/emailValidation/${token}'>http://localhost:3000/emailValidation/${token}</a>
+    <a target='_blank' href='http://localhost:3000/emailValidation/${token}'>
+    http://localhost:3000/emailValidation/${token}</a>
     `
     const message = {
         "html": template,
@@ -181,11 +185,16 @@ router.post('/sendMail', function async(req, res, next) {
 //change email address after clicking on the changeEmail link sent to the mail
 router.post('/changeEmail', function (req, res, next) {
     const { token } = req.body;
-    jwt.verify(token, clientSecret, (match) => {
-        if (!match) return res.status(400).json({ error: 'Invalid activation link' })
+    jwt.verify(token, clientSecret, (err, { _id, email }) => {
+        console.log('changeEmail')
+        console.log(err)
+        console.log(email)
+        if (err) return res.status(400).json({ error: 'Invalid activation link' })
         User.findOne({ _id })
             .then(user => {
+                console.log(user)
                 if (!user) return res.status(400).json({ error: 'No user found' })
+                if (user.email === email) return res.status(409).json({ error: 'Email is already registered !' })
                 User.findOneAndUpdate({ _id }, { email })
                     .then(user => {
                         return res.status(200).json({ user, token })

@@ -36,15 +36,12 @@ const upload = multer({ storage })
 
 //upload an image
 router.post('/upload', upload.single('avatar'), function (req, res, next) {
-    console.log(req.file)
     res.status(200).send(req.file.filename)
 })
 
 // get image stream
 router.get('/image/:filename', (req, res) => {
-    console.log('imagename' + req.params.filename)
     gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-        console.log(file)
         // Check if file
         if (!file || file.length === 0) {
             return res.status(404).json({
