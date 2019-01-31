@@ -41,8 +41,7 @@ router.post('/register', function (req, res, next) {
                     newUser.password = hash
                     newUser.save()
                         .then(user => {
-                            delete user.password
-                            return res.status(200).json({ user })
+                            return res.status(200).json({ data: 'you have successfully registered' })
                         })
                         .catch(err => { throw err })
                 })
@@ -125,9 +124,8 @@ router.put('/changePassword', function (req, res, next) {
                         .then(newHash => {
                             console.log('newHash' + newHash)
                             User.findOneAndUpdate({ _id }, { password: newHash })
-                                // .then(response => res.status(200).json({ success: 'Password changed successfully' }))
-                                .then(response => console.log('response ' + response))
-                                .catch(err => console.log(err))
+                                .then(response => res.status(200).json({ success: 'Password changed successfully' }))
+                                .catch(err => return res.status(400).json({ error: 'error changing password' }))
                         })
                         .catch(err => console.log(err))
                 })
@@ -149,12 +147,12 @@ router.post('/sendMail', function async(req, res, next) {
     `
     const message = {
         "html": template,
-        "text": "Example text content",
+        "text": "Authenticate email",
         "subject": "Email authentication",
         "from_email": "connections@hyphenmail.com",
         "from_name": "Hyphenapp",
         "to": [{
-            "email": "prabeen.strange@gmail.com",
+            "email": email,
             "name": "Recipient Name",
             "type": "to"
         }],
@@ -168,14 +166,6 @@ router.post('/sendMail', function async(req, res, next) {
     mandrillClient.messages.send({ "message": message, "async": async, "ip_pool": ip_pool, "send_at": send_at }, function (result) {
         console.log('mail sent');
         console.log(result);
-        /*
-        [{
-                "email": "recipient.email@example.com",
-                "status": "sent",
-                "reject_reason": "hard-bounce",
-                "_id": "abc123abc123abc123abc123abc123"
-            }]
-        */
     }, function (e) {
         // Mandrill returns the error as an object with name and message keys
         console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
