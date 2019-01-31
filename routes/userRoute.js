@@ -5,7 +5,6 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mandrill = require('mandrill-api/mandrill')
-// const mandrillClient = new mandrill.Mandrill('zBiwJhM-JAz7wXS0asx-AA')
 const mandrillClient = new mandrill.Mandrill(process.env.MANDRILL_KEY)
 const User = require('../models/userModel');
 const saltRound = 10;
@@ -53,19 +52,19 @@ router.post('/register', function (req, res, next) {
 //login request
 router.post('/login', function (req, res, next) {
     const { email, password } = req.body;
-    console.log(email)
     User.findOne({ email })
         .then(user => {
             if (!user) {
-                return res.status(404).json({ error: 'User not found' })
+                return res.status(404).json({ error: 'Invalid user' })
             }
             bcrypt.compare(password, user.password)
                 .then(match => {
                     if (!match) {
                         return res.status(400).json({ error: 'Icorrect password' })
                     }
+                    const { _id, userName, email, avatar } = user
                     const token = jwt.sign({ email }, clientSecret)
-                    return res.status(200).json({ user, token })
+                    return res.status(200).json({ user: { _id, userName, email, avatar }, token })
                 })
                 .catch(err => { throw err })
         })
@@ -125,7 +124,7 @@ router.put('/changePassword', function (req, res, next) {
                             console.log('newHash' + newHash)
                             User.findOneAndUpdate({ _id }, { password: newHash })
                                 .then(response => res.status(200).json({ success: 'Password changed successfully' }))
-                                .catch(err => return res.status(400).json({ error: 'error changing password' }))
+                                .catch(err => res.status(400).json({ error: 'error changing password' }))
                         })
                         .catch(err => console.log(err))
                 })
@@ -165,11 +164,9 @@ router.post('/sendMail', function async(req, res, next) {
     var send_at = new Date();
     mandrillClient.messages.send({ "message": message, "async": async, "ip_pool": ip_pool, "send_at": send_at }, function (result) {
         console.log('mail sent');
-        console.log(result);
+        return res.status(200).json({ data: 'mail sent' })
     }, function (e) {
-        // Mandrill returns the error as an object with name and message keys
-        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-        // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+        return res.status(404).json({ error: 'error sending mail' })
     });
 });
 
@@ -177,20 +174,24 @@ router.post('/sendMail', function async(req, res, next) {
 router.post('/changeEmail', function (req, res, next) {
     const { token } = req.body;
     jwt.verify(token, clientSecret, (err, { _id, email }) => {
+        console.clear()
         console.log('changeEmail')
         console.log(err)
         console.log(email)
         if (err) return res.status(400).json({ error: 'Invalid activation link' })
-        User.findOne({ _id })
+        User.findOne({ email })
             .then(user => {
                 console.log(user)
-                if (!user) return res.status(400).json({ error: 'No user found' })
-                if (user.email === email) return res.status(409).json({ error: 'Email is already registered !' })
-                User.findOneAndUpdate({ _id }, { email })
-                    .then(user => {
-                        return res.status(200).json({ user, token })
-                    })
-                    .catch(err => console.log('after updated', err))
+                if (user && user.email === email) {
+                    return res.status(409).json({ error: 'Email is already registered !' })
+                } else {
+                    User.findOneAndUpdate({ _id }, { email })
+                        .then(user => {
+                            const { _id, userName, email, avatar } = user
+                            return res.status(200).json({ user: { _id, userName, email, avatar } })
+                        })
+                        .catch(err => console.log('after updated', err))
+                }
             })
             .catch(err => console.log(err))
     })
