@@ -117,16 +117,18 @@ router.put('/changePassword', function (req, res, next) {
                     //if password doesn't match  return message "your current password doesn't match"
                     if (!match) {
                         return res.status(400).json({ error: 'your current password doesn\'t match' })
-                    }
-                    //if password match update db password with new hashed password
-                    hashPassword(newPassword)
+                    }else{
+
+                        //if password match update db password with new hashed password
+                        hashPassword(newPassword)
                         .then(newHash => {
                             console.log('newHash' + newHash)
                             User.findOneAndUpdate({ _id }, { password: newHash })
-                                .then(response => res.status(200).json({ success: 'Password changed successfully' }))
-                                .catch(err => res.status(400).json({ error: 'error changing password' }))
+                            .then(response => res.status(200).json({ success: 'Password changed successfully' }))
+                            .catch(err => res.status(400).json({ error: 'error changing password' }))
                         })
                         .catch(err => console.log(err))
+                    }
                 })
                 .catch(err => { throw err })
         })
@@ -164,6 +166,7 @@ router.post('/sendMail', function async(req, res, next) {
     var send_at = new Date();
     mandrillClient.messages.send({ "message": message, "async": async, "ip_pool": ip_pool, "send_at": send_at }, function (result) {
         console.log('mail sent');
+        console.log(result)
         return res.status(200).json({ data: 'mail sent' })
     }, function (e) {
         return res.status(404).json({ error: 'error sending mail' })
@@ -178,6 +181,7 @@ router.post('/changeEmail', function (req, res, next) {
         console.log('changeEmail')
         console.log(err)
         console.log(email)
+        const newEmail = email;
         if (err) return res.status(400).json({ error: 'Invalid activation link' })
         User.findOne({ email })
             .then(user => {
@@ -185,10 +189,12 @@ router.post('/changeEmail', function (req, res, next) {
                 if (user && user.email === email) {
                     return res.status(409).json({ error: 'Email is already registered !' })
                 } else {
-                    User.findOneAndUpdate({ _id }, { email })
+                    User.findOneAndUpdate({ _id }, { email: newEmail })
                         .then(user => {
+                            console.log('after update')
+                            console.log(user)
                             const { _id, userName, email, avatar } = user
-                            return res.status(200).json({ user: { _id, userName, email, avatar } })
+                            return res.status(200).json({ user: { _id, userName, email: newEmail, avatar } })
                         })
                         .catch(err => console.log('after updated', err))
                 }
