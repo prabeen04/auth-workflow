@@ -137,14 +137,38 @@ router.put('/changePassword', function (req, res, next) {
 
 //change password
 router.post('/forgotPassword', function (req, res, next) {
-    const { _id, newPassword } = req.body;
-    console.log(_id)
-    //find the user with given id
-    User.findOne({ _id })
-        .then(user => {
-            console.log(user)
-        })
-        .catch(err => console.log(err))
+    const { email } = req.body;
+    const token = jwt.sign({ email }, clientSecret)
+    const template = `
+    <p>Click on the link below to reset your password</p>
+    <a target='_blank' href='http://localhost:3000/resetPassword/${token}'>
+    http://localhost:3000/resetPassword/${token}</a>
+    `
+    const message = {
+        "html": template,
+        "text": "Authenticate email",
+        "subject": "Email authentication",
+        "from_email": "connections@hyphenmail.com",
+        "from_name": "Hyphenapp",
+        "to": [{
+            "email": email,
+            "name": "Recipient Name",
+            "type": "to"
+        }],
+        "headers": {
+            "Reply-To": "connections@hyphenmail.com"
+        }
+    };
+    var async = false;
+    var ip_pool = "Main Pool";
+    var send_at = new Date();
+    mandrillClient.messages.send({ "message": message, "async": async, "ip_pool": ip_pool, "send_at": send_at }, function (result) {
+        console.log('mail sent');
+        console.log(result)
+        return res.status(200).json({ data: 'mail sent' })
+    }, function (e) {
+        return res.status(404).json({ error: 'error sending mail' })
+    });
 });
 
 //send mail to the email address
@@ -183,6 +207,10 @@ router.post('/sendMail', function async(req, res, next) {
     }, function (e) {
         return res.status(404).json({ error: 'error sending mail' })
     });
+});
+//send mail to the email address
+router.post('/resetPassword', function async(req, res, next) {
+
 });
 
 //change email address after clicking on the changeEmail link sent to the mail
