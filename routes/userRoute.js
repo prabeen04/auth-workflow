@@ -117,20 +117,32 @@ router.put('/changePassword', function (req, res, next) {
                     //if password doesn't match  return message "your current password doesn't match"
                     if (!match) {
                         return res.status(400).json({ error: 'your current password doesn\'t match' })
-                    }else{
+                    } else {
 
                         //if password match update db password with new hashed password
                         hashPassword(newPassword)
-                        .then(newHash => {
-                            console.log('newHash' + newHash)
-                            User.findOneAndUpdate({ _id }, { password: newHash })
-                            .then(response => res.status(200).json({ success: 'Password changed successfully' }))
-                            .catch(err => res.status(400).json({ error: 'error changing password' }))
-                        })
-                        .catch(err => console.log(err))
+                            .then(newHash => {
+                                console.log('newHash' + newHash)
+                                User.findOneAndUpdate({ _id }, { password: newHash })
+                                    .then(response => res.status(200).json({ success: 'Password changed successfully' }))
+                                    .catch(err => res.status(400).json({ error: 'error changing password' }))
+                            })
+                            .catch(err => console.log(err))
                     }
                 })
                 .catch(err => { throw err })
+        })
+        .catch(err => console.log(err))
+});
+
+//change password
+router.post('/forgotPassword', function (req, res, next) {
+    const { _id, newPassword } = req.body;
+    console.log(_id)
+    //find the user with given id
+    User.findOne({ _id })
+        .then(user => {
+            console.log(user)
         })
         .catch(err => console.log(err))
 });
