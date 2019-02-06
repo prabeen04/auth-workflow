@@ -138,6 +138,7 @@ router.put('/changePassword', function (req, res, next) {
 //change password
 router.post('/forgotPassword', function (req, res, next) {
     const { email } = req.body;
+    console.log('forgot password' + email)
     const token = jwt.sign({ email }, clientSecret)
     const template = `
     <p>Click on the link below to reset your password</p>
@@ -210,7 +211,22 @@ router.post('/sendMail', function async(req, res, next) {
 });
 //send mail to the email address
 router.post('/resetPassword', function async(req, res, next) {
-
+    const { token } = req.body;
+    //get email from token
+    jwt.verify(token, clientSecret, (err, { email }) => {
+        if (err) return res.status(400).json({ error: 'Invalid link' })
+        User.findOne({ email })
+            .then(user => {
+                //check if user exist with the given email
+                console.log(user)
+                if (user) {
+                    return res.status(200).json({ status: true })
+                } else {
+                    return res.status(200).json({ status: false })
+                }
+            })
+            .catch(err => console.log(err))
+    })
 });
 
 //change email address after clicking on the changeEmail link sent to the mail
