@@ -220,7 +220,7 @@ router.post('/resetPassword', function async(req, res, next) {
                 //check if user exist with the given email
                 console.log(user)
                 if (user) {
-                    return res.status(200).json({ status: true })
+                    return res.status(200).json({ status: true, id: user._id })
                 } else {
                     return res.status(200).json({ status: false })
                 }
