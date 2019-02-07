@@ -229,6 +229,24 @@ router.post('/resetPassword', function async(req, res, next) {
     })
 });
 
+//POST request to /users
+router.post('/setPassword', function (req, res, next) {
+    const { id, newPassword } = req.body;
+    User.findOne({ _id: id })
+        .then(user => {
+            hashPassword(newPassword)
+                .then(hash => {
+                    User.findOneAndUpdate({ _id: id }, { password: hash })
+                        .then(user => {
+                            return res.status(200).json({ data: 'you have successfully set your password' })
+                        })
+                        .catch(err => { throw err })
+                })
+                .catch(err => console.log(err))
+        })
+        .catch(err => { throw err })
+});
+
 //change email address after clicking on the changeEmail link sent to the mail
 router.post('/changeEmail', function (req, res, next) {
     const { token } = req.body;
