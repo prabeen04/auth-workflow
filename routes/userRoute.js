@@ -232,6 +232,8 @@ router.post('/resetPassword', function async(req, res, next) {
 //POST request to /users
 router.post('/setPassword', function (req, res, next) {
     const { id, newPassword } = req.body;
+    console.log('````````````````````````')
+    console.log(id, newPassword)
     User.findOne({ _id: id })
         .then(user => {
             hashPassword(newPassword)
